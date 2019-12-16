@@ -83,6 +83,7 @@ def main(self):
          Loginbutton = QPushButton(language[1], self)
          Loginbutton.setGeometry(150,400, 100, 50)
          Loginbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#66c2ff")
+         Loginbutton.setShortcut("Return")
 
          Fromregisterreturnbutton = QPushButton(language[4], self)
          Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
@@ -97,6 +98,7 @@ def main(self):
          CreateNotebutton.setGeometry(680,510, 200, 50)
          CreateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          CreateNotebutton.setVisible(False)
+         CreateNotebutton.setShortcut("Ctrl+N")
 
          ExtindedRegisterbutton = QPushButton(language[5], self)
          ExtindedRegisterbutton.setGeometry(260,400, 170, 50)
@@ -107,16 +109,19 @@ def main(self):
          SaveNotebutton.setGeometry(680,510, 200, 50)
          SaveNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SaveNotebutton.setVisible(False)
+         SaveNotebutton.setShortcut("Ctrl+S")
 
          UpdateNotebutton = QPushButton(language[8], self)
          UpdateNotebutton.setGeometry(680,510, 200, 50)
          UpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          UpdateNotebutton.setVisible(False)
+         UpdateNotebutton.setShortcut("Ctrl+S")
 
          Returnbutton = QPushButton(language[4], self)
          Returnbutton.setGeometry(20,510, 200, 50)
          Returnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          Returnbutton.setVisible(False)
+         Returnbutton.setShortcut("Esc")
 
          DeleteNotebutton = QPushButton(language[9], self)
          DeleteNotebutton.setGeometry(480,510, 200, 50)
@@ -132,6 +137,7 @@ def main(self):
          SecondUpdateNotebutton.setGeometry(680,510, 200, 50)
          SecondUpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SecondUpdateNotebutton.setVisible(False)
+         SecondUpdateNotebutton.setShortcut("Ctrl+S")
 
          settingsbtn = QPushButton(language[16], self)
          settingsbtn.setGeometry(20,510, 200, 50)
@@ -147,6 +153,7 @@ def main(self):
          SecondReturnbutton.setGeometry(20,510, 200, 50)
          SecondReturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SecondReturnbutton.setVisible(False)
+         SecondReturnbutton.setShortcut("Esc")
 
          Changepasswordbutton =QPushButton(language[18], self)
          Changepasswordbutton.setGeometry(240,510, 200, 50)
@@ -176,11 +183,13 @@ def main(self):
          SaveNewPasswordButton.setGeometry(260,400, 170, 50)
          SaveNewPasswordButton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SaveNewPasswordButton.setVisible(False)
+         SaveNewPasswordButton.setShortcut('Ctrl+S')
 
          CreateUserbutton = QPushButton(language[21], self)
          CreateUserbutton.setGeometry(680,510, 200, 50)
          CreateUserbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          CreateUserbutton.setVisible(False)
+         CreateUserbutton.setShortcut("Ctrl+N")
 
          SearchNoteinp = QLineEdit("", self)
          SearchNoteinp.setPlaceholderText(language[24])
@@ -287,6 +296,19 @@ def main(self):
          dbexist= Path("savedbfile")
          self.textfromnote = ""
          self.forgoodret = False
+         def clear():
+             for i in total:
+                 i.setVisible(False)
+         def registration():
+             clear()
+             Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
+             logininput.setVisible(True)
+             passwordinput.setVisible(True)
+             ExtindedRegisterbutton.setVisible(True)
+             Regl.setVisible(True)
+             Fromregisterreturnbutton.setVisible(True)
+             logininput.setText("")
+             passwordinput.setText("")
 
 
          if not dbaexist.is_file():
@@ -294,6 +316,7 @@ def main(self):
              Savedbafile = open('savedbafile', "wb")
              pickle.dump(dba, Savedbafile)
              Savedbafile.close()
+             registration()
          else:
              readdba = open('savedbafile', 'rb')
              dba = pickle.load(readdba)
@@ -303,6 +326,7 @@ def main(self):
              Savedbfile = open('savedbfile', "wb")
              pickle.dump(db, Savedbfile)
              Savedbfile.close()
+             
          else:
              readdb = open('savedbfile', 'rb')
              db = pickle.load(readdb)
@@ -436,7 +460,6 @@ def main(self):
              SecondChangePasswordinput.setVisible(True)
              ChangePasswordinput.setVisible(True)
              SaveNewPasswordButton.setVisible(True)
-             print(dba)
 
 
 
@@ -445,7 +468,6 @@ def main(self):
              reply = QMessageBox.question(self, 'Delete User',
                 "Are you sure?", QMessageBox.Yes |
                 QMessageBox.No, QMessageBox.No)
-            # reply.Icon(Question)
              if reply == QMessageBox.Yes:
                 del dba[self.loginptxt]
                 del db[self.loginptxt]
@@ -645,16 +667,7 @@ def main(self):
                   total.append(i)
 
 
-         def registration():
-             clear()
-             Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
-             logininput.setVisible(True)
-             passwordinput.setVisible(True)
-             ExtindedRegisterbutton.setVisible(True)
-             Regl.setVisible(True)
-             Fromregisterreturnbutton.setVisible(True)
-             logininput.setText("")
-             passwordinput.setText("")
+         
 
          def proccesofregistration():
              self.loginptxt = logininput.text()
@@ -683,7 +696,6 @@ def main(self):
 
          def login():
              if not self.checkforcash:
-                print('a')
                 self.loginptxt = logininput.text()
                 self.passinptxt = passwordinput.text()
              if self.loginptxt in dba and self.loginptxt != "admin":
@@ -744,7 +756,6 @@ def main(self):
             readtime = open('secash', 'rb')
             oldtime = pickle.load(readtime)
             readtime.close()
-            print(oldtime)
             for i in oldtime:
                 if not oldtime[i] >12:
                     oldminutes = i
@@ -765,10 +776,8 @@ def main(self):
          else:
              readlogin = open('cash', 'rb')
              self.cashforlogin = pickle.load(readlogin)
-             print(self.cashforlogin)
              for i in self.cashforlogin:
                  if i == 1:
-                     print('a')
                      self.checkforcash = True
                      self.loginptxt = self.cashforlogin[1]
                      self.passinptxt = dba[self.loginptxt]
