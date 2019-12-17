@@ -4,6 +4,7 @@ from PyQt5.QtCore import Qt
 import pickle
 from pathlib import Path
 import sys, os, os.path
+import hashlib
 from datetime import datetime
 
 app = QApplication([])
@@ -12,6 +13,8 @@ window = QWidget()
 def main(self):
          window.setGeometry(220, 50,900, 575)
          window.setWindowTitle('MiNotes')
+
+
          frameGeometry = self.frameGeometry()
          DestkopWidget = QDesktopWidget().availableGeometry().center()
          frameGeometry.moveCenter(DestkopWidget)
@@ -23,29 +26,45 @@ def main(self):
          ["Login", "Login","Login", "Password", "Return","Register", "Create a note", "Save", "Update", "Delete","This login don't exist", "Incorrect password","*This login already exist","*Too short password","Write a note", "Write more simbols", "Settings", "Delete User", "Change password", "Change User","Save password", "Create new User", "New password", "Repeat new password", "Find Note", "Language", "Night Theme", "Change Password","Settings"],
          ["Logare",'Logheazăte','Login-ul',"Parola","Întoarce-te","Înregistrează-te", "Crează o notiţă", "Salvează", "Actualizează", "Şterge", "Nu există aşa login", "Parolă incorectă", "*Acest login este rezervat", "*Parolă prea scurtă","Scrie o notiţă", "Foloseşte mai multe simboluri","Setări", "Şterge Utilizatorul", "Schimbă parola", "Schimbă Utilizatorul", "Salvează parola", "Crează un utilizator nou", "Parolă nouă", "Repetă parola"," Caută notiţa", "Limba", "Tema întunecată", "Schimba parola", "Setări" ]
          ]
-         languagefileexist= Path("langsets")
 
-         if not languagefileexist.is_file():
+         languagefileexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/langsets")
+
+
+
+         if os.path.isdir("C:/Users/user/AppData/Roaming/Mi.Notes"):
+
+            if not languagefileexist.is_file():
              languageindex = 1
-             writelang = open('langsets', "wb")
+             writelang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', "wb")
              pickle.dump(languageindex,writelang)
              writelang.close()
-         else:
-             readlang = open('langsets', 'rb')
+
+            else:
+             readlang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', 'rb')
              languageindex = pickle.load(readlang)
              readlang.close()
+
+         else:
+            os.mkdir("C:/Users/user/AppData/Roaming/Mi.Notes")
+            languageindex = 1
+            writelang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', "wb")
+            pickle.dump(languageindex,writelang)
+            writelang.close()
+
+         
+
          language = languagepacks[languageindex]
 
-         nightthemefileexist = Path("themesets")
+         nightthemefileexist = Path("C:/Users/user/AppData/Roaming/Mi.Notes/themesets")
          self.nightmodecontrol = int()
 
          if not nightthemefileexist.is_file():
              self.nightthemecontrol = 0
-             writetheme = open('themesets', "wb")
+             writetheme = open('C:/Users/user/AppData/Roaming/Mi.Notes/themesets', "wb")
              pickle.dump(self.nightthemecontrol,writetheme)
              writetheme.close()
          else:
-             readtheme = open('themesets', 'rb')
+             readtheme = open('C:/Users/user/AppData/Roaming/Mi.Notes/themesets', 'rb')
              self.nightmodecontrol = pickle.load(readtheme)
              readtheme.close()
          self.iffromstart = True
@@ -321,8 +340,8 @@ def main(self):
          insigns = [Settingsinsign, Login, Regl, ChangePasswordinsign]
          buttons = [Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, SecondUpdateNotebutton, settingsbtn, Deleteaccauntbutton, SecondReturnbutton,  Changepasswordbutton, SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton]
 
-         dbaexist= Path("savedbafile")
-         dbexist= Path("savedbfile")
+         dbaexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile")
+         dbexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile")
          self.textfromnote = ""
          self.forgoodret = False
          def clear():
@@ -342,22 +361,22 @@ def main(self):
 
          if not dbaexist.is_file():
              dba = {}
-             Savedbafile = open('savedbafile', "wb")
+             Savedbafile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile', "wb")
              pickle.dump(dba, Savedbafile)
              Savedbafile.close()
              registration()
          else:
-             readdba = open('savedbafile', 'rb')
+             readdba = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile', 'rb')
              dba = pickle.load(readdba)
              readdba.close()
          if not dbexist.is_file():
              db = {}
-             Savedbfile = open('savedbfile', "wb")
+             Savedbfile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile', "wb")
              pickle.dump(db, Savedbfile)
              Savedbfile.close()
              
          else:
-             readdb = open('savedbfile', 'rb')
+             readdb = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile', 'rb')
              db = pickle.load(readdb)
              readdb.close()
 
@@ -436,7 +455,7 @@ def main(self):
              
 
          def setcashdeleting():
-             savelogin = open('cash', "wb")
+             savelogin = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', "wb")
              pickle.dump({0:"user"}, savelogin)
              savelogin.close()
 
@@ -470,9 +489,10 @@ def main(self):
              whenuserselected()
 
          def SaveNewPassword():
-             if ChangePasswordinput.text() == SecondChangePasswordinput.text():
+             if ChangePasswordinput.text() == SecondChangePasswordinput.text() and len(ChangePasswordinput.text()) > 5:
                  dba[self.loginptxt] = ChangePasswordinput.text()
                  writedbainfile()
+                 whenuserselected()
 
 
          def ChangePassword():
@@ -611,7 +631,7 @@ def main(self):
                 SetWhiteMode()
          def writethemeinfile():
              print(self.nightmodecontrol)
-             savethemesets = open('themesets', "wb")
+             savethemesets = open('C:/Users/user/AppData/Roaming/Mi.Notes/themesets', "wb")
              savethemesets.truncate()
              pickle.dump(self.nightmodecontrol, savethemesets)
              savethemesets.close()
@@ -621,7 +641,7 @@ def main(self):
 
          def changelanguage(language):
              languageindex = languages[language]
-             writelang = open('langsets', "wb")
+             writelang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', "wb")
              writelang.truncate()
              pickle.dump(languageindex,writelang)
              writelang.close()
@@ -634,27 +654,27 @@ def main(self):
 
 
          def writedbinfile():
-             Savedbfile = open('savedbfile', "wb")
+             Savedbfile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile', "wb")
              Savedbfile.truncate()
              pickle.dump(db, Savedbfile)
              Savedbfile.close()
 
          def writedbainfile():
-             Savedbafile = open('savedbafile', "wb")
+             Savedbafile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile', "wb")
              Savedbafile.truncate()
              pickle.dump(dba, Savedbafile)
              Savedbafile.close()
 
          def writecashinfile():
              self.cashforlogin = {1:self.loginptxt}
-             savecash = open('cash', "wb")
+             savecash = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', "wb")
              savecash.truncate()
              pickle.dump(self.cashforlogin, savecash)
              savecash.close()
 
          def savecash():
              oldtime = {(int(datetime.now().strftime("%d"))) * 1440 + (int(datetime.now().strftime("%H"))) *60 + (int(datetime.now().strftime("%M"))+ 15):(int(datetime.now().strftime("%m")))}
-             saveoldtime = open('secash', "wb")
+             saveoldtime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', "wb")
              saveoldtime.truncate()
              pickle.dump(oldtime, saveoldtime)
              saveoldtime.close()
@@ -769,21 +789,21 @@ def main(self):
                  tlde.setVisible(True)
 
 
-         cash = Path('cash')
-         seccash = Path('secash')
+         cash = Path('C:/Users/user/AppData/Roaming/Mi.Notes/cash')
+         seccash = Path('C:/Users/user/AppData/Roaming/Mi.Notes/secash')
          if not seccash.is_file():
-             savetime = open('secash', "wb")
+             savetime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', "wb")
              pickle.dump({0:13}, savetime)
              savetime.close()
          else:
-            readtime = open('secash', 'rb')
+            readtime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', 'rb')
             oldtime = pickle.load(readtime)
             readtime.close()
             for i in oldtime:
                 if not oldtime[i] >12:
                     oldminutes = i
                     if oldtime[oldminutes] == int(datetime.now().strftime("%m")) and oldminutes < int(datetime.now().strftime("%d")) * 1440 + int(datetime.now().strftime("%H")) *60 + int(datetime.now().strftime("%M")):
-                        savetime = open('secash', "wb")
+                        savetime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', "wb")
                         pickle.dump({0:13}, savetime)
                         savetime.close()
                         setcashdeleting()
@@ -792,12 +812,12 @@ def main(self):
 
 
          if not cash.is_file():
-             savelogin = open('cash', "wb")
+             savelogin = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', "wb")
              pickle.dump({0:"Alan"}, savelogin)
              savelogin.close()
 
          else:
-             readlogin = open('cash', 'rb')
+             readlogin = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', 'rb')
              self.cashforlogin = pickle.load(readlogin)
              for i in self.cashforlogin:
                  if i == 1:
