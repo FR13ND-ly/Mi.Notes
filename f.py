@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import Qt
 import pickle
 from pathlib import Path
-import sys, os
+import sys, os, os.path
 from datetime import datetime
 
 app = QApplication([])
@@ -55,6 +55,7 @@ def main(self):
          logininput.setPlaceholderText(language[2],)
          logininput.setStyleSheet("font-size: 25px; font-family: Tahoma, Verdana;")
          logininput.setGeometry(150, 210,280,50)
+         #logininput.setToolTip()
 
 
          passwordinput = QLineEdit("", self)
@@ -84,86 +85,112 @@ def main(self):
          Loginbutton.setGeometry(150,400, 100, 50)
          Loginbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#66c2ff")
          Loginbutton.setShortcut("Return")
+         Loginbutton.setToolTip('Enter')
 
          Fromregisterreturnbutton = QPushButton(language[4], self)
          Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
-         Fromregisterreturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#66c2ff")
+         Fromregisterreturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          Fromregisterreturnbutton.setVisible(False)
+         Fromregisterreturnbutton.setShortcut("Ctrl+Esc")
+         Fromregisterreturnbutton.setToolTip("Ctrl+Esc")
 
          Registerbutton = QPushButton(language[5], self)
          Registerbutton.setGeometry(260,400, 170, 50)
          Registerbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#8cff66")
+         Registerbutton.setShortcut("Ctrl+Alt+N")
+         Registerbutton.setToolTip("Ctrl+Alt+N")
+
 
          CreateNotebutton = QPushButton(language[6], self)
          CreateNotebutton.setGeometry(680,510, 200, 50)
          CreateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          CreateNotebutton.setVisible(False)
          CreateNotebutton.setShortcut("Ctrl+N")
+         CreateNotebutton.setToolTip("Ctrl+N")
 
          ExtindedRegisterbutton = QPushButton(language[5], self)
          ExtindedRegisterbutton.setGeometry(260,400, 170, 50)
          ExtindedRegisterbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#8cff66")
          ExtindedRegisterbutton.setVisible(False)
+         ExtindedRegisterbutton.setShortcut("Return")
+         ExtindedRegisterbutton.setToolTip("Enter")
 
          SaveNotebutton = QPushButton(language[7], self)
          SaveNotebutton.setGeometry(680,510, 200, 50)
          SaveNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SaveNotebutton.setVisible(False)
          SaveNotebutton.setShortcut("Ctrl+S")
+         SaveNotebutton.setToolTip("Ctrl+S")
 
          UpdateNotebutton = QPushButton(language[8], self)
          UpdateNotebutton.setGeometry(680,510, 200, 50)
          UpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          UpdateNotebutton.setVisible(False)
          UpdateNotebutton.setShortcut("Ctrl+S")
+         UpdateNotebutton.setToolTip('Ctrl+S')
 
          Returnbutton = QPushButton(language[4], self)
          Returnbutton.setGeometry(20,510, 200, 50)
          Returnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          Returnbutton.setVisible(False)
          Returnbutton.setShortcut("Esc")
+         Returnbutton.setToolTip("Esc")
 
          DeleteNotebutton = QPushButton(language[9], self)
          DeleteNotebutton.setGeometry(480,510, 200, 50)
          DeleteNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          DeleteNotebutton.setVisible(False)
+         DeleteNotebutton.setShortcut("Ctrl+Del")
+         DeleteNotebutton.setToolTip("Ctrl+Del")
 
          SecondDeleteNotebutton = QPushButton(language[9], self)
          SecondDeleteNotebutton.setGeometry(480,510, 200, 50)
          SecondDeleteNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SecondDeleteNotebutton.setVisible(False)
+         SecondDeleteNotebutton.setShortcut("Ctrl+Del")
+         SecondDeleteNotebutton.setToolTip("Ctrl+Del")
 
          SecondUpdateNotebutton = QPushButton(language[8], self)
          SecondUpdateNotebutton.setGeometry(680,510, 200, 50)
          SecondUpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SecondUpdateNotebutton.setVisible(False)
          SecondUpdateNotebutton.setShortcut("Ctrl+S")
+         SecondUpdateNotebutton.setToolTip("Ctrl+S")
 
          settingsbtn = QPushButton(language[16], self)
          settingsbtn.setGeometry(20,510, 200, 50)
          settingsbtn.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          settingsbtn.setVisible(False)
+         settingsbtn.setShortcut("Alt+S")
+         settingsbtn.setToolTip("Alt+S")
 
          Deleteaccauntbutton =QPushButton(language[17], self)
          Deleteaccauntbutton.setGeometry(460,510, 200, 50)
          Deleteaccauntbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          Deleteaccauntbutton.setVisible(False)
+         Deleteaccauntbutton.setShortcut("Ctrl+Alt+Del")
+         Deleteaccauntbutton.setToolTip("Ctrl+Alt+Del")
 
          SecondReturnbutton = QPushButton(language[4], self)
          SecondReturnbutton.setGeometry(20,510, 200, 50)
          SecondReturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SecondReturnbutton.setVisible(False)
          SecondReturnbutton.setShortcut("Esc")
+         SecondReturnbutton.setToolTip("Esc")
 
          Changepasswordbutton =QPushButton(language[18], self)
          Changepasswordbutton.setGeometry(240,510, 200, 50)
          Changepasswordbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          Changepasswordbutton.setVisible(False)
+         Changepasswordbutton.setShortcut("Ctrl+P")
+         Changepasswordbutton.setToolTip("Ctrl+P")
 
          Returntologinbutton =QPushButton(language[19], self)
          Returntologinbutton.setGeometry(220,510, 200, 50)
          Returntologinbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          Returntologinbutton.setVisible(False)
+         Returntologinbutton.setShortcut('Esc')
+         Returntologinbutton.setToolTip("Esc")
 
          ChangePasswordinput = QLineEdit("", self)
          ChangePasswordinput.setPlaceholderText(language[22],)
@@ -183,13 +210,15 @@ def main(self):
          SaveNewPasswordButton.setGeometry(260,400, 170, 50)
          SaveNewPasswordButton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          SaveNewPasswordButton.setVisible(False)
-         SaveNewPasswordButton.setShortcut('Ctrl+S')
+         SaveNewPasswordButton.setShortcut('Return')
+         SaveNewPasswordButton.setToolTip("Enter")
 
          CreateUserbutton = QPushButton(language[21], self)
          CreateUserbutton.setGeometry(680,510, 200, 50)
          CreateUserbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          CreateUserbutton.setVisible(False)
-         CreateUserbutton.setShortcut("Ctrl+N")
+         CreateUserbutton.setShortcut("Ctrl+Alt+N")
+         CreateUserbutton.setToolTip("Ctrl+Alt+N")
 
          SearchNoteinp = QLineEdit("", self)
          SearchNoteinp.setPlaceholderText(language[24])
@@ -342,11 +371,6 @@ def main(self):
          AreYouSure.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          AreYouSure.setVisible(False)
 
-
-
-
-      #   logininput.setText("admin")
-       #  passwordinput.setText("root")
 
          if languageindex == 0:
              Loginbutton.setStyleSheet("font-size: 12px; font-family: Tahoma, Verdana; background-color:#66c2ff")
@@ -641,7 +665,6 @@ def main(self):
 
          def clear():
              savecash()
-             print(self.adminmodeseted)
              self.checkforcash = False
              SearchNoteinp.setText("")
              for i in total:
