@@ -4,12 +4,20 @@ from PyQt5.QtCore import Qt
 import pickle
 from pathlib import Path
 import sys, os, os.path
-import hashlib
 from datetime import datetime
+from cryptography.fernet import Fernet
 
 app = QApplication([])
 app.setStyle('Fusion')
 window = QWidget()
+#need a key after b, i hidded it for security
+password_cipher_key = b''
+passwordcipher = Fernet(password_cipher_key)
+
+#need a key after b, i hidded it for security
+notes_cipher_key = b''
+notescipher = Fernet(notes_cipher_key)
+
 def main(self):
          window.setGeometry(220, 50,900, 575)
          window.setWindowTitle('MiNotes')
@@ -490,7 +498,8 @@ def main(self):
 
          def SaveNewPassword():
              if ChangePasswordinput.text() == SecondChangePasswordinput.text() and len(ChangePasswordinput.text()) > 5:
-                 dba[self.loginptxt] = ChangePasswordinput.text()
+                 encryptedpassword = passwordcipher.encrypt((ChangePasswordinput.text()).encode('utf-8'))
+                 dba[self.loginptxt] = encryptedpassword
                  writedbainfile()
                  whenuserselected()
 
@@ -694,10 +703,10 @@ def main(self):
              zametca.setPlaceholderText(language[14])
 
 
-
          def notes():
               self.dbn.clear()
               for i in db[self.loginptxt]:
+                  i = (notescipher.decrypt(i)).decode('utf-8')
                   i = QTextEdit(i, self)
                   i.setVisible(True)
                   i.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
@@ -720,7 +729,8 @@ def main(self):
                  if not len(pasinptxt)<6:
                      aep.setVisible(False)
                      tsp.setVisible(False)
-                     newacc = {self.loginptxt: pasinptxt}
+                     encryptedpassword = passwordcipher.encrypt((pasinptxt).encode('utf-8'))
+                     newacc = {self.loginptxt: encryptedpassword}
                      notesfornewacc = {self.loginptxt: []}
                      dba.update(newacc)
                      db.update(notesfornewacc)
@@ -743,7 +753,7 @@ def main(self):
                 self.passinptxt = passwordinput.text()
              if self.loginptxt in dba and self.loginptxt != "admin":
                  tlde.setVisible(False)
-                 if self.passinptxt == dba[self.loginptxt]:
+                 if self.passinptxt ==(passwordcipher.decrypt(dba[self.loginptxt])).decode('utf-8') :
                      writecashinfile()
                      clear()
                      notes()
@@ -823,7 +833,7 @@ def main(self):
                  if i == 1:
                      self.checkforcash = True
                      self.loginptxt = self.cashforlogin[1]
-                     self.passinptxt = dba[self.loginptxt]
+                     self.passinptxt = (passwordcipher.decrypt(dba[self.loginptxt])).decode('utf-8') 
                      login()
 
              readlogin.close()
@@ -851,9 +861,11 @@ def main(self):
                  UpdateNotebutton.setVisible(True)
                  DeleteNotebutton.setVisible(True)
                  CreateNotebutton.setVisible(False)
+                 
 
-                 db[self.loginptxt].append(self.note)
+                 db[self.loginptxt].append(notescipher.encrypt((self.note).encode('utf-8')))
                  writedbinfile()
+                 print(db)
                  zametca.setPlaceholderText(language[14])
              else:
                  zametca.setPlaceholderText(language[15])
@@ -872,9 +884,8 @@ def main(self):
                 savecash()
              self.newnote = zametca.toPlainText()
              if len(self.newnote)>0:
-                 self.index = db[self.loginptxt].index(self.note)
-                 db[self.loginptxt].remove(self.note)
-                 db[self.loginptxt].insert(self.index, self.newnote)
+                 db[self.loginptxt].pop(len(db[self.loginptxt])-1)
+                 db[self.loginptxt].append(notescipher.encrypt((self.newnote).encode('utf-8')))
                  self.note = zametca.toPlainText()
                  writedbinfile()
                  zametca.setPlaceholderText(language[14])
@@ -888,9 +899,8 @@ def main(self):
                 savecash()
              self.newnote = zametca.toPlainText()
              if len(self.newnote)>0:
-                 self.index = db[self.loginptxt].index(self.dbn[self.a].toPlainText())
-                 db[self.loginptxt].remove(self.dbn[self.a].toPlainText())
-                 db[self.loginptxt].insert(self.index, self.newnote)
+                 db[self.loginptxt].pop(self.a)
+                 db[self.loginptxt].insert(self.a, notescipher.encrypt((self.newnote).encode('utf-8')))
                  self.note = zametca.toPlainText()
                  notes()
                  writedbinfile()
@@ -905,10 +915,9 @@ def main(self):
                 "Are you sure?", QMessageBox.Yes |
                 QMessageBox.No, QMessageBox.No)
              if removereply == QMessageBox.Yes:
-                index = db[self.loginptxt].index(self.dbn[self.a].toPlainText())
-                db[self.loginptxt].pop(index)
+                db[self.loginptxt].pop(self.a)
                 if not self.forgoodret:
-                    login()
+                    ret()
                 else:
                     secondret()
              writedbinfile()
@@ -921,7 +930,7 @@ def main(self):
              if secondremovereply == QMessageBox.Yes:
                 db[self.loginptxt].pop(len(db[self.loginptxt])-1)
                 if not self.forgoodret:
-                     login()
+                     ret()
                 else:
                      secondret()
                 writedbinfile()
