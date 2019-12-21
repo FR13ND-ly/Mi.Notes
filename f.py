@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 import pickle
 from pathlib import Path
 import sys, os, os.path
@@ -10,11 +10,11 @@ from cryptography.fernet import Fernet
 app = QApplication([])
 app.setStyle('Fusion')
 window = QWidget()
-#need a key after b, i hidded it for security
+#!!! need a key after b, i hidded it for security
 password_cipher_key = b''
 passwordcipher = Fernet(password_cipher_key)
 
-#need a key after b, i hidded it for security
+#!!! need a key after b, i hidded it for security
 notes_cipher_key = b''
 notescipher = Fernet(notes_cipher_key)
 
@@ -27,12 +27,13 @@ def main(self):
          DestkopWidget = QDesktopWidget().availableGeometry().center()
          frameGeometry.moveCenter(DestkopWidget)
          self.move(frameGeometry.topLeft())
+         menubar = QMenuBar(self)
 
 
          languagepacks =[
-         ["Авторизация",'Авторизоваться','Логин',"Пароль","Вернуться","Регистрироваться", "Создать Заметку", "Сохранить", "Обновить", "Удалить", "Такого аккаунта не сушествует", "Неправельный пароль", "*Этот логин зарезервирован", "*Слишком короткий пароль","Напиши заметку", "Напиши больще симболов", "Настройки", "Удалить пользователя", "Поменять пароль", "Поменять пользователя", "Сохранить пароль","создать нового пользователя", "Новый пароль","Повтори новый пароль", "Поискать заметки","Язык", "Темная тема", "Сменить пароль", "Настройки"],
-         ["Login", "Login","Login", "Password", "Return","Register", "Create a note", "Save", "Update", "Delete","This login don't exist", "Incorrect password","*This login already exist","*Too short password","Write a note", "Write more simbols", "Settings", "Delete User", "Change password", "Change User","Save password", "Create new User", "New password", "Repeat new password", "Find Note", "Language", "Night Theme", "Change Password","Settings"],
-         ["Logare",'Logheazăte','Login-ul',"Parola","Întoarce-te","Înregistrează-te", "Crează o notiţă", "Salvează", "Actualizează", "Şterge", "Nu există aşa login", "Parolă incorectă", "*Acest login este rezervat", "*Parolă prea scurtă","Scrie o notiţă", "Foloseşte mai multe simboluri","Setări", "Şterge Utilizatorul", "Schimbă parola", "Schimbă Utilizatorul", "Salvează parola", "Crează un utilizator nou", "Parolă nouă", "Repetă parola"," Caută notiţa", "Limba", "Tema întunecată", "Schimba parola", "Setări" ]
+         ["Авторизация",'Авторизоваться','Логин',"Пароль","Вернуться","Регистрироваться", "Создать Заметку", "Сохранить", "Обновить", "Удалить", "Такого аккаунта не сушествует", "Неправельный пароль", "*Этот логин зарезервирован", "*Минимум 6 симболов","Напиши заметку", "Напиши больще симболов", "Настройки", "Удалить пользователя", "Поменять пароль", "Поменять пользователя", "Сохранить пароль","создать нового пользователя", "Новый пароль","Повтори новый пароль", "Поискать заметки","Язык", "Темная тема", "Сменить пароль", "Настройки","Логин не может быть 'admin'","пароли не равны", "* Минимум 2 симбола", "Удалить все данные"],
+         ["Login", "Login","Login", "Password", "Return","Register", "Create a note", "Save", "Update", "Delete","This login don't exist", "Incorrect password","*This login already exist","*Minimum 6 symbols","Write a note", "Write more simbols", "Settings", "Delete User", "Change password", "Change User","Save password", "Create new User", "New password", "Repeat new password", "Find Note", "Language", "Night Theme", "Change Password","Settings","Login can't be 'admin'","passwords do not match", "*Minimum 2 symbols", "Delete all data"],
+         ["Logare",'Logheazăte','Login-ul',"Parola","Întoarce-te","Înregistrează-te", "Crează o notiţă", "Salvează", "Actualizează", "Şterge", "Nu există aşa login", "Parolă incorectă", "*Acest login este rezervat", "*Minim 6 simboluri","Scrie o notiţă", "Foloseşte mai multe simboluri","Setări", "Şterge Utilizatorul", "Schimbă parola", "Schimbă Utilizatorul", "Salvează parola", "Crează un utilizator nou", "Parolă nouă", "Repetă parola"," Caută notiţa", "Limba", "Tema întunecată", "Schimba parola", "Setări", "Login-ul nu poate fi 'admin'","parolele nu coincid", "*Minim 2 simboluri", "Șterge toate datele" ]
          ]
 
          languagefileexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/langsets")
@@ -250,8 +251,13 @@ def main(self):
          SearchNoteinp = QLineEdit("", self)
          SearchNoteinp.setPlaceholderText(language[24])
          SearchNoteinp.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
-         SearchNoteinp.setGeometry(420,510, 260, 50)
+         SearchNoteinp.setGeometry(425,510, 250, 50)
          SearchNoteinp.setVisible(False)
+
+         Deletealldatabutton =QPushButton(language[32], self)
+         Deletealldatabutton.setGeometry(460,510, 200, 50)
+         Deletealldatabutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Deletealldatabutton.setVisible(False)
 
 
 
@@ -334,24 +340,43 @@ def main(self):
          nightthemecheck = QCheckBox(self)
          nightthemecheck.move(220,255)
          nightthemecheck.setVisible(False)
+         
+         logincantbeadminerror = QLabel(language[29],self)      
+         logincantbeadminerror.setStyleSheet("font-size: 20px; font-family: Tahoma, Verdana; color: Red")
+         logincantbeadminerror.move(450, 221)
+         logincantbeadminerror.setVisible(False)
+
+         itsnotthesamepassword = QLabel(language[30],self)      
+         itsnotthesamepassword.setStyleSheet("font-size: 20px; font-family: Tahoma, Verdana; color: Red")
+         itsnotthesamepassword.move(450, 221)
+         itsnotthesamepassword.setVisible(False)
+
+         tooshortlogin = QLabel(language[31],self)      
+         tooshortlogin.setStyleSheet("font-size: 20px; font-family: Tahoma, Verdana; color: Red")
+         tooshortlogin.move(450, 221)
+         tooshortlogin.setVisible(False)
 
 
 
 
 
-         total = [zametca, sm, tsp, aep, Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, Login, logininput, passwordinput, ipw, tlde, Regl, SecondUpdateNotebutton, settingsbtn, languageinsign, languageselector, nighttheme,nightthemecheck,ScrollAreaofAdmins, Deleteaccauntbutton, SecondReturnbutton, Changepasswordbutton, SecondChangePasswordinput, ChangePasswordinput,SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton, SearchNoteinp, Settingsinsign, ChangePasswordinsign ]
+
+         total = [zametca, sm, tsp, aep, Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, Login, logininput, passwordinput, ipw, tlde, Regl, SecondUpdateNotebutton, settingsbtn, languageinsign, languageselector, nighttheme,nightthemecheck,ScrollAreaofAdmins, Deleteaccauntbutton, SecondReturnbutton, Changepasswordbutton, SecondChangePasswordinput, ChangePasswordinput,SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton, SearchNoteinp, Settingsinsign, ChangePasswordinsign, logincantbeadminerror , itsnotthesamepassword, tooshortlogin, Deletealldatabutton]
          firstscreen = [Login, logininput, passwordinput,Loginbutton, Registerbutton, ]
          secondscreen = [CreateNotebutton,sm, settingsbtn, Returntologinbutton,SearchNoteinp]
          thirdscreen = [zametca,SaveNotebutton, Returnbutton]
          fourthscreen = [zametca, Returnbutton, UpdateNotebutton,DeleteNotebutton]
-         settingscreen = [languageselector, languageinsign, Returnbutton, nighttheme, nightthemecheck, Settingsinsign]
+         settingscreen = [languageselector, languageinsign, Returnbutton, nighttheme, nightthemecheck, Settingsinsign,]
          insigns = [Settingsinsign, Login, Regl, ChangePasswordinsign]
-         buttons = [Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, SecondUpdateNotebutton, settingsbtn, Deleteaccauntbutton, SecondReturnbutton,  Changepasswordbutton, SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton]
+         buttons = [Deletealldatabutton,Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, SecondUpdateNotebutton, settingsbtn, Deleteaccauntbutton, SecondReturnbutton,  Changepasswordbutton, SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton]
 
          dbaexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile")
          dbexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile")
          self.textfromnote = ""
          self.forgoodret = False
+         logininput.setText('Alan')
+         passwordinput.setText("wellcome")
+         
          def clear():
              for i in total:
                  i.setVisible(False)
@@ -398,19 +423,19 @@ def main(self):
          AreYouSure.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          AreYouSure.setVisible(False)
 
-
          if languageindex == 0:
              Loginbutton.setStyleSheet("font-size: 12px; font-family: Tahoma, Verdana; background-color:#66c2ff")
              CreateUserbutton.setStyleSheet("font-size: 14px; font-family: Tahoma, Verdana;")
              Regl.move(130, 105)
          elif languageindex == 2:
              nightthemecheck.move(270,255)
+            
 
 
 
          def SetDarkMode():
              window.setStyleSheet("background-color : #262626")
-             zametca.setStyleSheet(" color: #FFF;font-size: 16px; border: 1px solid #e6e6e6; border-radius: 3px; background-color:#666")
+             zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #e6e6e6; border-radius: 3px; background-color:#666")
              nighttheme.setStyleSheet("font-size: 25px; font-family: Tahoma, Verdana; color:#FFF")
              nightthemecheck.setStyleSheet("color:#FFF; border: 0px solid #FFF;border-radius: 3px;")
              languageselector.setStyleSheet("border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px; color: #FFF;")
@@ -426,8 +451,15 @@ def main(self):
              languageinsign.setStyleSheet("color: #FFF;font-size: 25px")
              for i in insigns:
                 i.setStyleSheet("color: #FFF;font-size: 55px")
+
              for i in buttons:
                  i.setStyleSheet('border: 1px solid #e6e6e6;; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333333')
+             DeleteNotebutton.setStyleSheet('border: 1px solid #ff0000; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+             SecondDeleteNotebutton.setStyleSheet('border: 1px solid #ff0000; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+             SaveNotebutton.setStyleSheet('border: 1px solid #00ff00; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+             UpdateNotebutton.setStyleSheet('border: 1px solid #00ff00; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+             SecondUpdateNotebutton.setStyleSheet('border: 1px solid #00ff00; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+             CreateNotebutton.setStyleSheet('border: 1px solid #0000ff; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
 
          if self.nightmodecontrol ==1:
              SetDarkMode()
@@ -435,6 +467,20 @@ def main(self):
 
 
          self.show()
+
+         def Deletingalldata():
+            changeuserreply = QMessageBox.question(self, 'Delete all data?',
+                "Are you sure?", QMessageBox.Yes |
+                QMessageBox.No, QMessageBox.No)
+            if changeuserreply == QMessageBox.Yes:
+                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/cash')
+                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/langsets')
+                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/secash')
+                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile')
+                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile')
+                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/themesets')
+                python = sys.executable
+                os.execl(python, python, * sys.argv)
 
          def SearchNote():
              for i in self.dbn:
@@ -471,6 +517,7 @@ def main(self):
 
 
          def setlistofnotes():
+             greenline()
              for i in db[self.loginptxt]:
                  i = QTextEdit(i, self)
                  i.setGeometry(20,20, 200, 230)
@@ -494,7 +541,10 @@ def main(self):
 
 
          def secondret():
-             whenuserselected()
+             if self.adminmodeseted:
+                whenuserselected()
+             else:
+                ret()
 
          def SaveNewPassword():
              if ChangePasswordinput.text() == SecondChangePasswordinput.text() and len(ChangePasswordinput.text()) > 5:
@@ -502,6 +552,14 @@ def main(self):
                  dba[self.loginptxt] = encryptedpassword
                  writedbainfile()
                  whenuserselected()
+             elif ChangePasswordinput.text() != SecondChangePasswordinput.text():
+                itsnotthesamepassword.setVisible(True)
+                if len(ChangePasswordinput.text()) > 5:
+                    tsp.setVisible(False)
+             elif len(ChangePasswordinput.text()) <= 5:
+                tsp.setVisible(True)
+                if ChangePasswordinput.text() == SecondChangePasswordinput.text():
+                    itsnotthesamepassword.setVisible(False)
 
 
          def ChangePassword():
@@ -589,12 +647,13 @@ def main(self):
              clear()
              setcashdeleting()
              listofadmins()
+             Deletealldatabutton.setVisible(True)
              Fromregisterreturnbutton.setVisible(True)
              Fromregisterreturnbutton.setGeometry(20,510, 200, 50)
              ScrollAreaofAdmins.setVisible(True)
              CreateUserbutton.setVisible(True)
              settingsbtn.setVisible(True)
-             settingsbtn.setGeometry(230,510, 200, 50)
+             settingsbtn.setGeometry(240,510, 200, 50)
              self.adminmodeseted = True
              a = 0
              for i in range(len(self.listofusers)):
@@ -687,6 +746,14 @@ def main(self):
              saveoldtime.truncate()
              pickle.dump(oldtime, saveoldtime)
              saveoldtime.close()
+
+
+         def bordercolorsetnormal():
+            if self.nightmodecontrol == 1:
+                zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #e6e6e6; border-radius: 3px; background-color:#666")
+            else:
+                zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                 
              
 
 
@@ -724,8 +791,12 @@ def main(self):
          def proccesofregistration():
              self.loginptxt = logininput.text()
              pasinptxt = passwordinput.text()
-             if self.loginptxt not in dba and self.loginptxt != "admin":
+             tsp.setVisible(False)
+             if self.loginptxt not in dba and self.loginptxt != "admin" and len(self.loginptxt) >1:
                  aep.setVisible(False)
+                 logincantbeadminerror.setVisible(False)
+                 tooshortlogin.setVisible(False)
+
                  if not len(pasinptxt)<6:
                      aep.setVisible(False)
                      tsp.setVisible(False)
@@ -742,6 +813,10 @@ def main(self):
                      tsp.setVisible(True)
              elif self.loginptxt in dba:
                  aep.setVisible(True)
+             elif self.loginptxt == 'admin':
+                logincantbeadminerror.setVisible(True)
+             elif len(self.loginptxt) < 2:
+                tooshortlogin.setVisible(True)
 
 
 
@@ -795,6 +870,8 @@ def main(self):
              elif self.loginptxt == 'admin':
                  if self.passinptxt == "root":
                      adminmode()
+                 else:
+                    ipw.setVisible(True)
              elif self.loginptxt not in dba:
                  tlde.setVisible(True)
 
@@ -861,11 +938,14 @@ def main(self):
                  UpdateNotebutton.setVisible(True)
                  DeleteNotebutton.setVisible(True)
                  CreateNotebutton.setVisible(False)
-                 
-
                  db[self.loginptxt].append(notescipher.encrypt((self.note).encode('utf-8')))
                  writedbinfile()
-                 print(db)
+                 if self.nightmodecontrol == 1:
+                    zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #00ff00; border-radius: 3px; background-color:#666")
+                 else:
+                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                 
+                 QTimer.singleShot(500, bordercolorsetnormal)
                  zametca.setPlaceholderText(language[14])
              else:
                  zametca.setPlaceholderText(language[15])
@@ -888,6 +968,12 @@ def main(self):
                  db[self.loginptxt].append(notescipher.encrypt((self.newnote).encode('utf-8')))
                  self.note = zametca.toPlainText()
                  writedbinfile()
+                 if self.nightmodecontrol == 1:
+                    zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #00ff00; border-radius: 3px; background-color:#666")
+                 else:
+                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                 
+                 QTimer.singleShot(500, bordercolorsetnormal)
                  zametca.setPlaceholderText(language[14])
              else:
                  zametca.setPlaceholderText(language[15])
@@ -904,6 +990,12 @@ def main(self):
                  self.note = zametca.toPlainText()
                  notes()
                  writedbinfile()
+                 if self.nightmodecontrol == 1:
+                    zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #00ff00; border-radius: 3px; background-color:#666")
+                 else:
+                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                 
+                 QTimer.singleShot(500, bordercolorsetnormal)
                  zametca.setPlaceholderText(language[14])
              else:
                  zametca.setPlaceholderText(language[15])
@@ -940,6 +1032,8 @@ def main(self):
              clear()
              if not self.adminmodeseted:
                 savecash()
+                Changepasswordbutton.setVisible(True)
+                Changepasswordbutton.setGeometry(60,310, 200, 50)
              for i in settingscreen:
                  i.setVisible(True)
 
@@ -969,6 +1063,7 @@ def main(self):
          Fromregisterreturnbutton.clicked.connect(ChangeUser)
          Returntologinbutton.clicked.connect(ChangeUser)
          SearchNoteinp.textChanged.connect(SearchNote)
+         Deletealldatabutton.clicked.connect(Deletingalldata)
 
 
 
