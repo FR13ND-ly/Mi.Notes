@@ -10,11 +10,13 @@ from cryptography.fernet import Fernet
 app = QApplication([])
 app.setStyle('Fusion')
 window = QWidget()
-password_cipher_key = b'O-Mu7_bDPl1YJqpVWzk09w2xP_sCOKdW0zcrbdOTWc='
+
+password_cipher_key = b'kO-Mu7_bDPl1YJqpVWzk09w2xP_sCOKdW0zcrbdOTWc='
 passwordcipher = Fernet(password_cipher_key)
 
 notes_cipher_key = b'OSsbNvc0NfZnqji6Zq-LX1Bbr_17787PkJbJnexWt8w='
 notescipher = Fernet(notes_cipher_key)
+appdatalocation = os.getenv('APPDATA')
 
 def main(self):
          window.setGeometry(220, 50,900, 575)
@@ -38,27 +40,27 @@ def main(self):
          ["Logare",'Logheazăte','Login-ul',"Parola","Întoarce-te","Înregistrează-te", "Crează o notiţă", "Salvează", "Actualizează", "Şterge", "Nu există aşa login", "Parolă incorectă", "*Acest login este rezervat", "*Minim 6 simboluri","Scrie o notiţă", "Foloseşte mai multe simboluri","Setări", "Şterge Utilizatorul", "Schimbă parola", "Înapoi", "Salvează parola", "Crează un utilizator nou", "Parolă nouă", "Repetă parola"," Caută notiţa", "Limba", "Tema întunecată", "Schimba parola", "Setări", "Login-ul nu poate fi 'admin'","parolele nu coincid", "*Minim 2 simboluri", "Șterge toate datele", "Fail", "Notiţa", "Ieși-ți", "Utilizator" ]
          ]
 
-         languagefileexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/langsets")
+         languagefileexist= Path(appdatalocation + "/Mi.Notes/langsets")
 
 
 
-         if os.path.isdir("C:/Users/user/AppData/Roaming/Mi.Notes"):
+         if os.path.isdir(appdatalocation +"/Mi.Notes"):
 
             if not languagefileexist.is_file():
              languageindex = 1
-             writelang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', "wb")
+             writelang = open(appdatalocation + '/Mi.Notes/langsets', "wb")
              pickle.dump(languageindex,writelang)
              writelang.close()
 
             else:
-             readlang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', 'rb')
+             readlang = open(appdatalocation +'/Mi.Notes/langsets', 'rb')
              languageindex = pickle.load(readlang)
              readlang.close()
 
          else:
-            os.mkdir("C:/Users/user/AppData/Roaming/Mi.Notes")
+            os.mkdir(appdatalocation +"/Mi.Notes")
             languageindex = 1
-            writelang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', "wb")
+            writelang = open(appdatalocation +'/Mi.Notes/langsets', "wb")
             pickle.dump(languageindex,writelang)
             writelang.close()
 
@@ -66,21 +68,52 @@ def main(self):
 
          language = languagepacks[languageindex]
          mainMenu = QMenuBar(self)
+         
+         mainMenu.setVisible(True)
+
          fileMenu = mainMenu.addMenu(language[33])
 
          settingsaction = QAction(language[16], self)
+         settingsaction.setToolTip("Alt+S")
+
          changeuseraction = QAction(language[4], self)
+         changeuseraction.setToolTip("Esc")
+
          updatenoteaction = QAction(language[8], self)
+         updatenoteaction.setToolTip("Alt+S")
+
          deletenoteaction = QAction(language[9], self)
+         deletenoteaction.setToolTip("Ctrl+Del")
+
+
          savenoteaction = QAction(language[7], self)
+         savenoteaction.setToolTip("Ctrl+S")
+
          exitaction = QAction(language[35], self)
+         exitaction.setToolTip("Ctrl+Q")
+
          deleteuseraction = QAction(language[17], self)
+         deleteuseraction.setToolTip("Alt+Del")
+
          changepasswordaction = QAction(language[27], self)
+         changepasswordaction.setToolTip("Ctrl+P")
+
          deletealldataaction = QAction(language[32], self)
+         deletealldataaction.setToolTip("Ctrl+Alt+Del")
+
          createnewuseraction = QAction(language[21], self)
+         createnewuseraction.setToolTip("Ctrl+Alt+N")
+
          createnoteaction =QAction(language[6], self)
-         noteMenu = fileMenu.addMenu(language[34])
-         userMenu = fileMenu.addMenu(language[36])
+         createnoteaction.setToolTip("Ctrl+N")
+
+         totalactions = [createnoteaction,createnewuseraction,deletealldataaction,changepasswordaction,deleteuseraction,exitaction,savenoteaction,deletenoteaction,updatenoteaction, changeuseraction,settingsaction]
+         for i in totalactions:
+            i.setVisible(True)
+         fileMenu.addAction(settingsaction)
+         fileMenu.addSeparator()
+         fileMenu.addAction(exitaction)
+
 
 
          def basicmenubar():
@@ -89,6 +122,7 @@ def main(self):
             fileMenu.addAction(exitaction)
          def loginmenubar():
             userMenu = fileMenu.addMenu("User")
+            fileMenu.addAction(createnoteaction)
             for i in usermenuactions:
                 userMenu.addAction(i)
             fileMenu.addAction(settingsaction)
@@ -113,6 +147,7 @@ def main(self):
             fileMenu.addAction(exitaction)
          def whenuserselectedmenubar():
             fileMenu.clear()
+            fileMenu.addAction(createnoteaction)
             for i in usermenuactions:
                 userMenu.addAction(i)
             fileMenu.addAction(deletealldataaction)
@@ -139,21 +174,22 @@ def main(self):
 
          usermenuactions = [changeuseraction, createnewuseraction, deleteuseraction]
          filmenuactions = [settingsaction, exitaction]
+
          noteactions = [createnoteaction, updatenoteaction, deletenoteaction]
          
 
 
 
-         nightthemefileexist = Path("C:/Users/user/AppData/Roaming/Mi.Notes/themesets")
+         nightthemefileexist = Path(appdatalocation +"/Mi.Notes/themesets")
          self.nightmodecontrol = int()
 
          if not nightthemefileexist.is_file():
              self.nightthemecontrol = 0
-             writetheme = open('C:/Users/user/AppData/Roaming/Mi.Notes/themesets', "wb")
+             writetheme = open(appdatalocation + '/Mi.Notes/themesets', "wb")
              pickle.dump(self.nightthemecontrol,writetheme)
              writetheme.close()
          else:
-             readtheme = open('C:/Users/user/AppData/Roaming/Mi.Notes/themesets', 'rb')
+             readtheme = open(appdatalocation +'/Mi.Notes/themesets', 'rb')
              self.nightmodecontrol = pickle.load(readtheme)
              readtheme.close()
          self.iffromstart = True
@@ -196,7 +232,7 @@ def main(self):
 
          Fromregisterreturnbutton = QPushButton(language[4], self)
          Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
-         Fromregisterreturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Fromregisterreturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#f6cd61")
          Fromregisterreturnbutton.setVisible(False)
          Fromregisterreturnbutton.setShortcut("Ctrl+Esc")
          Fromregisterreturnbutton.setToolTip("Ctrl+Esc")
@@ -210,7 +246,7 @@ def main(self):
 
          CreateNotebutton = QPushButton(language[6], self)
          CreateNotebutton.setGeometry(680,510, 200, 50)
-         CreateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         CreateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#66c2ff")
          CreateNotebutton.setVisible(False)
          CreateNotebutton.setShortcut("Ctrl+N")
          CreateNotebutton.setToolTip("Ctrl+N")
@@ -224,71 +260,58 @@ def main(self):
 
          SaveNotebutton = QPushButton(language[7], self)
          SaveNotebutton.setGeometry(680,510, 200, 50)
-         SaveNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         SaveNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana; background-color:#8cff66")
          SaveNotebutton.setVisible(False)
          SaveNotebutton.setShortcut("Ctrl+S")
          SaveNotebutton.setToolTip("Ctrl+S")
 
          UpdateNotebutton = QPushButton(language[8], self)
          UpdateNotebutton.setGeometry(680,510, 200, 50)
-         UpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         UpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#8cff66")
          UpdateNotebutton.setVisible(False)
-         UpdateNotebutton.setShortcut("Ctrl+S")
-         UpdateNotebutton.setToolTip('Ctrl+S')
+         UpdateNotebutton.setShortcut("Alt+S")
+         UpdateNotebutton.setToolTip('Alt+S')
 
          Returnbutton = QPushButton(language[4], self)
          Returnbutton.setGeometry(20,510, 200, 50)
-         Returnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Returnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#f6cd61")
          Returnbutton.setVisible(False)
          Returnbutton.setShortcut("Esc")
          Returnbutton.setToolTip("Esc")
 
          DeleteNotebutton = QPushButton(language[9], self)
-         DeleteNotebutton.setGeometry(480,510, 200, 50)
-         DeleteNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         DeleteNotebutton.setGeometry(475,510, 200, 50)
+         DeleteNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#fe4a49")
          DeleteNotebutton.setVisible(False)
          DeleteNotebutton.setShortcut("Ctrl+Del")
          DeleteNotebutton.setToolTip("Ctrl+Del")
 
-         SecondDeleteNotebutton = QPushButton(language[9], self)
-         SecondDeleteNotebutton.setGeometry(480,510, 200, 50)
-         SecondDeleteNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
-         SecondDeleteNotebutton.setVisible(False)
-         SecondDeleteNotebutton.setShortcut("Ctrl+Del")
-         SecondDeleteNotebutton.setToolTip("Ctrl+Del")
-
-         SecondUpdateNotebutton = QPushButton(language[8], self)
-         SecondUpdateNotebutton.setGeometry(680,510, 200, 50)
-         SecondUpdateNotebutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
-         SecondUpdateNotebutton.setVisible(False)
-         SecondUpdateNotebutton.setShortcut("Ctrl+S")
-         SecondUpdateNotebutton.setToolTip("Ctrl+S")
 
 
          Deleteaccauntbutton =QPushButton(language[17], self)
          Deleteaccauntbutton.setGeometry(460,510, 200, 50)
-         Deleteaccauntbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Deleteaccauntbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#854442")
          Deleteaccauntbutton.setVisible(False)
          Deleteaccauntbutton.setShortcut("Ctrl+Alt+Del")
          Deleteaccauntbutton.setToolTip("Ctrl+Alt+Del")
 
          SecondReturnbutton = QPushButton(language[4], self)
          SecondReturnbutton.setGeometry(20,510, 200, 50)
-         SecondReturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         SecondReturnbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#f6cd61")
          SecondReturnbutton.setVisible(False)
          SecondReturnbutton.setShortcut("Esc")
          SecondReturnbutton.setToolTip("Esc")
 
          Changepasswordbutton =QPushButton(language[18], self)
          Changepasswordbutton.setGeometry(240,510, 200, 50)
-         Changepasswordbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Changepasswordbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#fe4a49")
          Changepasswordbutton.setVisible(False)
          Changepasswordbutton.setShortcut("Ctrl+P")
          Changepasswordbutton.setToolTip("Ctrl+P")
 
          Returntologinbutton =QPushButton(language[19], self)
          Returntologinbutton.setGeometry(20,510, 200, 50)
-         Returntologinbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Returntologinbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#f6cd61")
          Returntologinbutton.setVisible(False)
          Returntologinbutton.setShortcut('Esc')
          Returntologinbutton.setToolTip("Esc")
@@ -309,14 +332,14 @@ def main(self):
 
          SaveNewPasswordButton= QPushButton(language[20], self)
          SaveNewPasswordButton.setGeometry(260,400, 170, 50)
-         SaveNewPasswordButton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         SaveNewPasswordButton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#8cff66")
          SaveNewPasswordButton.setVisible(False)
          SaveNewPasswordButton.setShortcut('Return')
          SaveNewPasswordButton.setToolTip("Enter")
 
          CreateUserbutton = QPushButton(language[21], self)
          CreateUserbutton.setGeometry(680,510, 200, 50)
-         CreateUserbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         CreateUserbutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#8cff66")
          CreateUserbutton.setVisible(False)
          CreateUserbutton.setShortcut("Ctrl+Alt+N")
          CreateUserbutton.setToolTip("Ctrl+Alt+N")
@@ -329,7 +352,7 @@ def main(self):
 
          Deletealldatabutton =QPushButton(language[32], self)
          Deletealldatabutton.setGeometry(240,510, 200, 50)
-         Deletealldatabutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+         Deletealldatabutton.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;background-color:#854442")
          Deletealldatabutton.setVisible(False)
 
 
@@ -428,30 +451,34 @@ def main(self):
          tooshortlogin.setStyleSheet("font-size: 20px; font-family: Tahoma, Verdana; color: Red")
          tooshortlogin.move(450, 221)
          tooshortlogin.setVisible(False)
-         fileMenu.clear()
+         mainMenu.clear()
+         fileMenu = mainMenu.addMenu(language[33])
          basicmenubar()
+         mainMenu.setVisible(True)
 
 
 
 
 
 
-         total = [zametca, sm, tsp, aep, Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, Login, logininput, passwordinput, ipw, tlde, Regl, SecondUpdateNotebutton, languageinsign, languageselector, nighttheme,nightthemecheck,ScrollAreaofAdmins, Deleteaccauntbutton, SecondReturnbutton, Changepasswordbutton, SecondChangePasswordinput, ChangePasswordinput,SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton, SearchNoteinp, Settingsinsign, ChangePasswordinsign, logincantbeadminerror , itsnotthesamepassword, tooshortlogin, Deletealldatabutton]
+         total = [zametca, sm, tsp, aep, Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, Login, logininput, passwordinput, ipw, tlde, Regl, languageinsign, languageselector, nighttheme,nightthemecheck,ScrollAreaofAdmins, Deleteaccauntbutton, SecondReturnbutton, Changepasswordbutton, SecondChangePasswordinput, ChangePasswordinput,SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton, SearchNoteinp, Settingsinsign, ChangePasswordinsign, logincantbeadminerror , itsnotthesamepassword, tooshortlogin, Deletealldatabutton]
          firstscreen = [Login, logininput, passwordinput,Loginbutton, Registerbutton, ]
          secondscreen = [CreateNotebutton,sm, Returntologinbutton,SearchNoteinp]
          thirdscreen = [zametca,SaveNotebutton, Returnbutton]
          fourthscreen = [zametca, Returnbutton, UpdateNotebutton,DeleteNotebutton]
          settingscreen = [languageselector, languageinsign, Returnbutton, nighttheme, nightthemecheck, Settingsinsign,]
          insigns = [Settingsinsign, Login, Regl, ChangePasswordinsign]
-         buttons = [Deletealldatabutton,Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, SecondDeleteNotebutton, SecondUpdateNotebutton, Deleteaccauntbutton, SecondReturnbutton,  Changepasswordbutton, SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton]
+         buttons = {Deletealldatabutton: 2,Loginbutton: 1, Registerbutton: 0, CreateNotebutton:1, ExtindedRegisterbutton: 0, SaveNotebutton: 0, UpdateNotebutton: 0, Returnbutton: 3, DeleteNotebutton: 2, Deleteaccauntbutton: 4, SecondReturnbutton:3,  Changepasswordbutton:2, SaveNewPasswordButton: 0, CreateUserbutton: 0, Fromregisterreturnbutton: 3, Returntologinbutton:3, Deletealldatabutton: 4}
+         inputs = [logininput, passwordinput, ChangePasswordinput, SecondChangePasswordinput, SearchNoteinp,]
 
-         dbaexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile")
-         dbexist= Path("C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile")
+         dbaexist= Path(appdatalocation +"/Mi.Notes/savedbafile")
+         dbexist= Path(appdatalocation +"/Mi.Notes/savedbfile")
          self.textfromnote = ""
          self.a = ""
          self.forgoodret = False
          self.checkiflogined = False
-
+#         logininput.setText('Alan')
+ #        passwordinput.setText("wellcome")
          
          def clear():
              for i in total:
@@ -470,22 +497,22 @@ def main(self):
 
          if not dbaexist.is_file():
              dba = {}
-             Savedbafile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile', "wb")
+             Savedbafile = open(appdatalocation +'/Mi.Notes/savedbafile', "wb")
              pickle.dump(dba, Savedbafile)
              Savedbafile.close()
              registration()
          else:
-             readdba = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile', 'rb')
+             readdba = open(appdatalocation +'/Mi.Notes/savedbafile', 'rb')
              dba = pickle.load(readdba)
              readdba.close()
          if not dbexist.is_file():
              db = {}
-             Savedbfile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile', "wb")
+             Savedbfile = open(appdatalocation +'/Mi.Notes/savedbfile', "wb")
              pickle.dump(db, Savedbfile)
              Savedbfile.close()
              
          else:
-             readdb = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile', 'rb')
+             readdb = open(appdatalocation +'/Mi.Notes/savedbfile', 'rb')
              db = pickle.load(readdb)
              readdb.close()
 
@@ -498,6 +525,7 @@ def main(self):
          AreYouSure.move(150, 105)
          AreYouSure.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
          AreYouSure.setVisible(False)
+         mainMenu.setStyleSheet("color: #000")
 
          if languageindex == 0:
              Loginbutton.setStyleSheet("font-size: 12px; font-family: Tahoma, Verdana; background-color:#66c2ff")
@@ -510,34 +538,34 @@ def main(self):
 
 
          def SetDarkMode():
+             mainMenu.setStyleSheet("color: #fff")
              window.setStyleSheet("background-color : #262626")
              zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #e6e6e6; border-radius: 3px; background-color:#666")
              nighttheme.setStyleSheet("font-size: 25px; font-family: Tahoma, Verdana; color:#FFF")
              nightthemecheck.setStyleSheet("color:#FFF; border: 0px solid #FFF;border-radius: 3px;")
              languageselector.setStyleSheet("border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px; color: #FFF;")
              layout.setStyleSheet("background-color:#333333")
+             ChangePasswordinsign.setStyleSheet("color: #FFF;font-size: 55px")
+             languageinsign.setStyleSheet("color: #FFF;font-size: 25px")
              if self.iffromstart:
                  nightthemecheck.toggle()
-             logininput.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px; ;color:#FFF")
-             passwordinput.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px;;color:#FFF")
-             SecondChangePasswordinput.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px;;color:#FFF")
-             ChangePasswordinput.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px;;color:#FFF")
-             ChangePasswordinsign.setStyleSheet("color: #FFF;font-size: 55px")
-             SearchNoteinp.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius: 3px; font-size: 16px;;color:#FFF")
-             languageinsign.setStyleSheet("color: #FFF;font-size: 25px")
+             for i in inputs:
+                i.setStyleSheet("background-color:#666;border: 2px solid #e6e6e6; border-radius: 3px; font-size: 16px; ;color:#FFF")
              for i in insigns:
                 i.setStyleSheet("color: #FFF;font-size: 55px")
-
              for i in buttons:
-                 i.setStyleSheet('border: 1px solid #e6e6e6;; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333333')
-             DeleteNotebutton.setStyleSheet('border: 1px solid #ff0000; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
-             SecondDeleteNotebutton.setStyleSheet('border: 1px solid #ff0000; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
-             SaveNotebutton.setStyleSheet('border: 1px solid #00ff00; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
-             UpdateNotebutton.setStyleSheet('border: 1px solid #00ff00; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
-             SecondUpdateNotebutton.setStyleSheet('border: 1px solid #00ff00; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
-             CreateNotebutton.setStyleSheet('border: 1px solid #0000ff; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+                if buttons[i] == 0:
+                    i.setStyleSheet('border: 2px solid #8cff66; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+                elif buttons[i] == 1:
+                    i.setStyleSheet('border: 2px solid #66c2ff; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+                elif buttons[i] == 2:
+                    i.setStyleSheet('border: 2px solid #fe4a49 ; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+                elif buttons[i] == 3:
+                    i.setStyleSheet('border: 2px solid #f6cd61 ; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
+                elif buttons[i] == 4:
+                    i.setStyleSheet('border: 2px solid #854442; border-radius: 3px; font-size: 16px; color: #FFF; background-color: #333')
 
-         if self.nightmodecontrol ==1:
+         if self.nightmodecontrol == 1:
              SetDarkMode()
 
 
@@ -545,16 +573,16 @@ def main(self):
          self.show()
 
          def Deletingalldata():
-            changeuserreply = QMessageBox.question(self, 'Delete all data?',
+            deletealldatareply = QMessageBox.question(self, 'Delete all data?',
                 "Are you sure?", QMessageBox.Yes |
                 QMessageBox.No, QMessageBox.No)
-            if changeuserreply == QMessageBox.Yes:
-                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/cash')
-                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/langsets')
-                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/secash')
-                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile')
-                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile')
-                os.remove('C:/Users/user/AppData/Roaming/Mi.Notes/themesets')
+            if deletealldatareply == QMessageBox.Yes:
+                os.remove(appdatalocation +'/Mi.Notes/cash')
+                os.remove(appdatalocation +'/Mi.Notes/langsets')
+                os.remove(appdatalocation +'/Mi.Notes/secash')
+                os.remove(appdatalocation +'/Mi.Notes/savedbafile')
+                os.remove(appdatalocation +'/Mi.Notes/savedbfile')
+                os.remove(appdatalocation +'/Mi.Notes/themesets')
                 python = sys.executable
                 os.execl(python, python, * sys.argv)
 
@@ -584,7 +612,7 @@ def main(self):
              
 
          def setcashdeleting():
-             savelogin = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', "wb")
+             savelogin = open(appdatalocation +'/Mi.Notes/cash', "wb")
              pickle.dump({0:"user"}, savelogin)
              savelogin.close()
 
@@ -703,8 +731,8 @@ def main(self):
                      for l in thirdscreen:
                          l.setVisible(True)
                      self.a = a
-                     SecondUpdateNotebutton.setVisible(True)
-                     SecondDeleteNotebutton.setVisible(True)
+                     UpdateNotebutton.setVisible(True)
+                     DeleteNotebutton.setVisible(True)
                      CreateNotebutton.setVisible(False)
                      zametca.setText(self.dbn[self.a].toPlainText())
                      adminmodenotemenubar()
@@ -788,7 +816,7 @@ def main(self):
                 SetWhiteMode()
          def writethemeinfile():
              print(self.nightmodecontrol)
-             savethemesets = open('C:/Users/user/AppData/Roaming/Mi.Notes/themesets', "wb")
+             savethemesets = open(appdatalocation +'/Mi.Notes/themesets', "wb")
              savethemesets.truncate()
              pickle.dump(self.nightmodecontrol, savethemesets)
              savethemesets.close()
@@ -798,7 +826,7 @@ def main(self):
 
          def changelanguage(language):
              languageindex = languages[language]
-             writelang = open('C:/Users/user/AppData/Roaming/Mi.Notes/langsets', "wb")
+             writelang = open(appdatalocation + '/Mi.Notes/langsets', "wb")
              writelang.truncate()
              pickle.dump(languageindex,writelang)
              writelang.close()
@@ -812,27 +840,27 @@ def main(self):
 
 
          def writedbinfile():
-             Savedbfile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbfile', "wb")
+             Savedbfile = open(appdatalocation + '/Mi.Notes/savedbfile', "wb")
              Savedbfile.truncate()
              pickle.dump(db, Savedbfile)
              Savedbfile.close()
 
          def writedbainfile():
-             Savedbafile = open('C:/Users/user/AppData/Roaming/Mi.Notes/savedbafile', "wb")
+             Savedbafile = open(appdatalocation + '/Mi.Notes/savedbafile', "wb")
              Savedbafile.truncate()
              pickle.dump(dba, Savedbafile)
              Savedbafile.close()
 
          def writecashinfile():
              self.cashforlogin = {1:self.loginptxt}
-             savecash = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', "wb")
+             savecash = open(appdatalocation + '/Mi.Notes/cash', "wb")
              savecash.truncate()
              pickle.dump(self.cashforlogin, savecash)
              savecash.close()
 
          def savecash():
              oldtime = {(int(datetime.now().strftime("%d"))) * 1440 + (int(datetime.now().strftime("%H"))) *60 + (int(datetime.now().strftime("%M"))+ 15):(int(datetime.now().strftime("%m")))}
-             saveoldtime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', "wb")
+             saveoldtime = open(appdatalocation + '/Mi.Notes/secash', "wb")
              saveoldtime.truncate()
              pickle.dump(oldtime, saveoldtime)
              saveoldtime.close()
@@ -851,6 +879,12 @@ def main(self):
 
          def clear():
              savecash()
+             readdba = open(appdatalocation +'/Mi.Notes/savedbafile', 'rb')
+             dba = pickle.load(readdba)
+             readdba.close()
+             readdb = open(appdatalocation +'/Mi.Notes/savedbfile', 'rb')
+             db = pickle.load(readdb)
+             readdb.close()
              self.checkforcash = False
              SearchNoteinp.setText("")
              for i in total:
@@ -938,8 +972,8 @@ def main(self):
                              for l in thirdscreen:
                                  l.setVisible(True)
                              self.a = a
-                             SecondUpdateNotebutton.setVisible(True)
-                             SecondDeleteNotebutton.setVisible(True)
+                             UpdateNotebutton.setVisible(True)
+                             DeleteNotebutton.setVisible(True)
                              CreateNotebutton.setVisible(False)
                              zametca.setText(self.dbn[self.a].toPlainText())
                              self.adminmodeseted = False
@@ -971,21 +1005,21 @@ def main(self):
                  tlde.setVisible(True)
 
 
-         cash = Path('C:/Users/user/AppData/Roaming/Mi.Notes/cash')
-         seccash = Path('C:/Users/user/AppData/Roaming/Mi.Notes/secash')
+         cash = Path(appdatalocation + '/Mi.Notes/cash')
+         seccash = Path(appdatalocation + '/Mi.Notes/secash')
          if not seccash.is_file():
-             savetime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', "wb")
+             savetime = open(appdatalocation + '/Mi.Notes/secash', "wb")
              pickle.dump({0:13}, savetime)
              savetime.close()
          else:
-            readtime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', 'rb')
+            readtime = open(appdatalocation + '/Mi.Notes/secash', 'rb')
             oldtime = pickle.load(readtime)
             readtime.close()
             for i in oldtime:
                 if not oldtime[i] >12:
                     oldminutes = i
                     if oldtime[oldminutes] == int(datetime.now().strftime("%m")) and oldminutes < int(datetime.now().strftime("%d")) * 1440 + int(datetime.now().strftime("%H")) *60 + int(datetime.now().strftime("%M")):
-                        savetime = open('C:/Users/user/AppData/Roaming/Mi.Notes/secash', "wb")
+                        savetime = open(appdatalocation + '/Mi.Notes/secash', "wb")
                         pickle.dump({0:13}, savetime)
                         savetime.close()
                         setcashdeleting()
@@ -994,12 +1028,12 @@ def main(self):
 
 
          if not cash.is_file():
-             savelogin = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', "wb")
+             savelogin = open(appdatalocation + '/Mi.Notes/cash', "wb")
              pickle.dump({0:"Alan"}, savelogin)
              savelogin.close()
 
          else:
-             readlogin = open('C:/Users/user/AppData/Roaming/Mi.Notes/cash', 'rb')
+             readlogin = open(appdatalocation + '/Mi.Notes/cash', 'rb')
              self.cashforlogin = pickle.load(readlogin)
              for i in self.cashforlogin:
                  if i == 1:
@@ -1015,7 +1049,7 @@ def main(self):
 
          def newnote():
              clear()
-             
+             self.a = ""
              if not self.adminmodeseted:
                 savecash()
              else:
@@ -1045,7 +1079,7 @@ def main(self):
                  if self.nightmodecontrol == 1:
                     zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #00ff00; border-radius: 3px; background-color:#666")
                  else:
-                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;border: 1px solid #00ff00")
                  
                  QTimer.singleShot(500, bordercolorsetnormal)
                  zametca.setPlaceholderText(language[14])
@@ -1066,10 +1100,10 @@ def main(self):
                 savecash()
              self.newnote = zametca.toPlainText()
              if len(self.newnote)>0:
-                 if type(self.a) is int:
+                 if type(self.a) is str:
                     db[self.loginptxt].pop(len(db[self.loginptxt])-1)
                     db[self.loginptxt].append(notescipher.encrypt((self.newnote).encode('utf-8')))
-                 elif type(self.a) is str:
+                 elif type(self.a) is int:
                     db[self.loginptxt].pop(self.a)
                     db[self.loginptxt].insert(self.a, notescipher.encrypt((self.newnote).encode('utf-8')))
                  self.note = zametca.toPlainText()
@@ -1080,7 +1114,7 @@ def main(self):
                  if self.nightmodecontrol == 1:
                     zametca.setStyleSheet("color: #FFF;font-size: 16px; border: 1px solid #00ff00; border-radius: 3px; background-color:#666")
                  else:
-                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                    zametca.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;border: 1px solid #00ff00")
                  
                  QTimer.singleShot(1000, bordercolorsetnormal)
                  zametca.setPlaceholderText(language[14])
@@ -1129,8 +1163,6 @@ def main(self):
          SaveNotebutton.clicked.connect(savenote)
          Returnbutton.clicked.connect(ret)
          DeleteNotebutton.clicked.connect(simpleremove)
-         SecondDeleteNotebutton.clicked.connect(simpleremove)
-         SecondUpdateNotebutton.clicked.connect(upnote)
          Registerbutton.clicked.connect(registration)
          languageselector.activated[str].connect(changelanguage)
          nightthemecheck.stateChanged.connect(ThemeSettings)
