@@ -11,7 +11,6 @@ import urllib.request
 app = QApplication([])
 app.setStyle('Fusion')
 window = QWidget()
-
 password_cipher_key = b'kO-Mu7_bDPl1YJqpVWzk09w2xP_sCOKdW0zcrbdOTWc='
 passwordcipher = Fernet(password_cipher_key)
 
@@ -462,12 +461,8 @@ def main(self):
          tooshortlogin.setVisible(False)
          basicmenubar()
          mainMenu.setVisible(True)
-
-
-
-
-
-
+         dbaexist= Path(appdatalocation +"/Mi.Notes/savedbafile")
+         dbexist= Path(appdatalocation +"/Mi.Notes/savedbfile")
          total = [zametca, sm, tsp, aep, Loginbutton, Registerbutton, CreateNotebutton, ExtindedRegisterbutton, SaveNotebutton, UpdateNotebutton, Returnbutton, DeleteNotebutton, Login, logininput, passwordinput, ipw, tlde, Regl, languageinsign, languageselector, nighttheme,nightthemecheck,ScrollAreaofAdmins, Deleteaccauntbutton, SecondReturnbutton, Changepasswordbutton, SecondChangePasswordinput, ChangePasswordinput,SaveNewPasswordButton, CreateUserbutton, Fromregisterreturnbutton, Returntologinbutton, SearchNoteinp, Settingsinsign, ChangePasswordinsign, logincantbeadminerror , itsnotthesamepassword, tooshortlogin, Deletealldatabutton]
          firstscreen = [Login, logininput, passwordinput,Loginbutton, Registerbutton, ]
          secondscreen = [CreateNotebutton,sm, Returntologinbutton,SearchNoteinp]
@@ -477,31 +472,14 @@ def main(self):
          insigns = [Settingsinsign, Login, Regl, ChangePasswordinsign]
          buttons = {Deletealldatabutton: 2,Loginbutton: 1, Registerbutton: 0, CreateNotebutton:1, ExtindedRegisterbutton: 0, SaveNotebutton: 0, UpdateNotebutton: 0, Returnbutton: 3, DeleteNotebutton: 2, Deleteaccauntbutton: 4, SecondReturnbutton:3,  Changepasswordbutton:2, SaveNewPasswordButton: 0, CreateUserbutton: 0, Fromregisterreturnbutton: 3, Returntologinbutton:3, Deletealldatabutton: 4}
          inputs = [logininput, passwordinput, ChangePasswordinput, SecondChangePasswordinput, SearchNoteinp,]
-
-         dbaexist= Path(appdatalocation +"/Mi.Notes/savedbafile")
-         dbexist= Path(appdatalocation +"/Mi.Notes/savedbfile")
          self.textfromnote = ""
          self.a = ""
          self.forgoodret = False
          self.checkiflogined = False
-         logininput.setText('Alan')
-         passwordinput.setText("wellcome")
-         
-         def clear():
-             for i in total:
-                 i.setVisible(False)
-         def registration():
-             clear()
-             Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
-             logininput.setVisible(True)
-             passwordinput.setVisible(True)
-             ExtindedRegisterbutton.setVisible(True)
-             Regl.setVisible(True)
-             Fromregisterreturnbutton.setVisible(True)
-             logininput.setText("")
-             passwordinput.setText("")
-
-
+         self.dbn = []
+         self.listofusers = []
+         self.checkforcash = False
+         self.adminmodeseted = False
          if not dbaexist.is_file():
              dba = {}
              Savedbafile = open(appdatalocation +'/Mi.Notes/savedbafile', "wb")
@@ -522,12 +500,162 @@ def main(self):
              readdb = open(appdatalocation +'/Mi.Notes/savedbfile', 'rb')
              db = pickle.load(readdb)
              readdb.close()
+         def clear():
+             for i in total:
+                 i.setVisible(False)
+         def writecashinfile():
+             self.cashforlogin = {1:self.loginptxt}
+             savecash = open(appdatalocation + '/Mi.Notes/cash', "wb")
+             savecash.truncate()
+             pickle.dump(self.cashforlogin, savecash)
+             savecash.close()
+
+         def savecash():
+             oldtime = {(int(datetime.now().strftime("%d"))) * 1440 + (int(datetime.now().strftime("%H"))) *60 + (int(datetime.now().strftime("%M"))+ 15):(int(datetime.now().strftime("%m")))}
+             saveoldtime = open(appdatalocation + '/Mi.Notes/secash', "wb")
+             saveoldtime.truncate()
+             pickle.dump(oldtime, saveoldtime)
+             saveoldtime.close()
+         def notes():
+              self.dbn.clear()
+              for i in db[self.loginptxt]:
+                  i = (notescipher.decrypt(i)).decode('utf-8')
+                  i = QTextEdit(i, self)
+                  i.setVisible(True)
+                  i.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
+                  if self.nightmodecontrol == 1:
+                      i.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius 3px; font-size: 16px; color:#FFF")
+                  i.setFixedHeight(430)
+                  i.setFixedWidth(400)
+                  self.dbn.append(i)
+                  vbox.addWidget(i)
+                  total.append(i)
 
 
-         self.dbn = []
-         self.listofusers = []
-         self.checkforcash = False
-         self.adminmodeseted = False
+         def login():
+             if not self.checkforcash:
+                self.loginptxt = logininput.text()
+                self.passinptxt = passwordinput.text()
+             if self.loginptxt in dba and self.loginptxt != "admin":
+                 tlde.setVisible(False)
+                 if self.passinptxt ==(passwordcipher.decrypt(dba[self.loginptxt])).decode('utf-8') :
+
+                     writecashinfile()
+                     clear()
+                     notes()
+                     savecash()
+                     a = 0
+                     self.adminmodeseted = False
+                     self.forgoodret = False
+                     self.checkiflogined = True
+                     mainMenu.clear()
+                     loginmenubar()
+
+
+                     for i in range(len(self.dbn)):
+                         def changenote(a = a):
+                             clear()
+                             for l in thirdscreen:
+                                 l.setVisible(True)
+                             self.a = a
+                             UpdateNotebutton.setVisible(True)
+                             DeleteNotebutton.setVisible(True)
+                             CreateNotebutton.setVisible(False)
+                             zametca.setText(self.dbn[self.a].toPlainText())
+                             self.adminmodeseted = False
+                             notemenubar()
+                             if self.forgoodret:
+                                 Returnbutton.setVisible(False)
+
+                                 SecondReturnbutton.setVisible(True)
+
+                         if a != 3:
+                             self.dbn[a].cursorPositionChanged.connect(changenote, a)
+
+                         elif len(self.dbn) >2:
+                               if a == 3:
+                                   self.dbn[3].cursorPositionChanged.connect(changenote)
+                         a += 1
+
+                     for i in secondscreen:
+                         i.setVisible(True)
+
+                 else:
+                     ipw.setVisible(True)
+             elif self.loginptxt == 'admin':
+                 if self.passinptxt == "root":
+                     adminmode()
+                 else:
+                    ipw.setVisible(True)
+             elif self.loginptxt not in dba:
+                 tlde.setVisible(True)
+
+
+         cash = Path(appdatalocation + '/Mi.Notes/cash')
+         seccash = Path(appdatalocation + '/Mi.Notes/secash')
+         if not seccash.is_file():
+             savetime = open(appdatalocation + '/Mi.Notes/secash', "wb")
+             pickle.dump({0:13}, savetime)
+             savetime.close()
+         else:
+            readtime = open(appdatalocation + '/Mi.Notes/secash', 'rb')
+            oldtime = pickle.load(readtime)
+            readtime.close()
+            for i in oldtime:
+                if not oldtime[i] >12:
+                    oldminutes = i
+                    if oldtime[oldminutes] == int(datetime.now().strftime("%m")) and oldminutes < int(datetime.now().strftime("%d")) * 1440 + int(datetime.now().strftime("%H")) *60 + int(datetime.now().strftime("%M")):
+                        savetime = open(appdatalocation + '/Mi.Notes/secash', "wb")
+                        pickle.dump({0:13}, savetime)
+                        savetime.close()
+                        setcashdeleting()
+             
+
+
+
+         if not cash.is_file():
+             savelogin = open(appdatalocation + '/Mi.Notes/cash', "wb")
+             pickle.dump({0:"Alan"}, savelogin)
+             savelogin.close()
+
+         else:
+             readlogin = open(appdatalocation + '/Mi.Notes/cash', 'rb')
+             self.cashforlogin = pickle.load(readlogin)
+             for i in self.cashforlogin:
+                 if i == 1:
+                     self.checkforcash = True
+                     self.loginptxt = self.cashforlogin[1]
+                     self.passinptxt = (passwordcipher.decrypt(dba[self.loginptxt])).decode('utf-8') 
+                     login()
+
+             readlogin.close()
+
+
+
+
+
+
+         
+
+         
+         
+         
+         def registration():
+             clear()
+             Fromregisterreturnbutton.setGeometry(150,400, 100, 50)
+             logininput.setVisible(True)
+             passwordinput.setVisible(True)
+             ExtindedRegisterbutton.setVisible(True)
+             Regl.setVisible(True)
+             Fromregisterreturnbutton.setVisible(True)
+             logininput.setText("")
+             passwordinput.setText("")
+
+
+         
+
+
+         
          AreYouSure = QLabel(language[5], self)
          AreYouSure.move(150, 105)
          AreYouSure.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
@@ -667,7 +795,6 @@ def main(self):
                 if len(ChangePasswordinput.text()) > 5:
                     tsp.setVisible(False)
              elif len(ChangePasswordinput.text()) <= 5:
-                tsp.setVisible(True)
                 if ChangePasswordinput.text() == SecondChangePasswordinput.text():
                     itsnotthesamepassword.setVisible(False)
 
@@ -953,19 +1080,7 @@ def main(self):
              pickle.dump(dba, Savedbafile)
              Savedbafile.close()
 
-         def writecashinfile():
-             self.cashforlogin = {1:self.loginptxt}
-             savecash = open(appdatalocation + '/Mi.Notes/cash', "wb")
-             savecash.truncate()
-             pickle.dump(self.cashforlogin, savecash)
-             savecash.close()
-
-         def savecash():
-             oldtime = {(int(datetime.now().strftime("%d"))) * 1440 + (int(datetime.now().strftime("%H"))) *60 + (int(datetime.now().strftime("%M"))+ 15):(int(datetime.now().strftime("%m")))}
-             saveoldtime = open(appdatalocation + '/Mi.Notes/secash', "wb")
-             saveoldtime.truncate()
-             pickle.dump(oldtime, saveoldtime)
-             saveoldtime.close()
+         
 
 
          def bordercolorsetnormal():
@@ -996,20 +1111,7 @@ def main(self):
              zametca.setPlaceholderText(language[14])
 
 
-         def notes():
-              self.dbn.clear()
-              for i in db[self.loginptxt]:
-                  i = (notescipher.decrypt(i)).decode('utf-8')
-                  i = QTextEdit(i, self)
-                  i.setVisible(True)
-                  i.setStyleSheet("font-size: 16px; font-family: Tahoma, Verdana;")
-                  if self.nightmodecontrol == 1:
-                      i.setStyleSheet("background-color:#666;border: 1px solid #e6e6e6; border-radius 3px; font-size: 16px; color:#FFF")
-                  i.setFixedHeight(430)
-                  i.setFixedWidth(400)
-                  self.dbn.append(i)
-                  vbox.addWidget(i)
-                  total.append(i)
+         
 
 
          
@@ -1043,110 +1145,6 @@ def main(self):
                 logincantbeadminerror.setVisible(True)
              elif len(self.loginptxt) < 2:
                 tooshortlogin.setVisible(True)
-
-
-
-
-
-         def login():
-             if not self.checkforcash:
-                self.loginptxt = logininput.text()
-                self.passinptxt = passwordinput.text()
-             if self.loginptxt in dba and self.loginptxt != "admin":
-                 tlde.setVisible(False)
-                 if self.passinptxt ==(passwordcipher.decrypt(dba[self.loginptxt])).decode('utf-8') :
-
-                     writecashinfile()
-                     clear()
-                     notes()
-                     savecash()
-                     a = 0
-                     self.adminmodeseted = False
-                     self.forgoodret = False
-                     self.checkiflogined = True
-                     mainMenu.clear()
-                     loginmenubar()
-
-
-                     for i in range(len(self.dbn)):
-                         def changenote(a = a):
-                             clear()
-                             for l in thirdscreen:
-                                 l.setVisible(True)
-                             self.a = a
-                             UpdateNotebutton.setVisible(True)
-                             DeleteNotebutton.setVisible(True)
-                             CreateNotebutton.setVisible(False)
-                             zametca.setText(self.dbn[self.a].toPlainText())
-                             self.adminmodeseted = False
-                             notemenubar()
-                             if self.forgoodret:
-                                 Returnbutton.setVisible(False)
-
-                                 SecondReturnbutton.setVisible(True)
-
-                         if a != 3:
-                             self.dbn[a].cursorPositionChanged.connect(changenote, a)
-
-                         elif len(self.dbn) >2:
-                               if a == 3:
-                                   self.dbn[3].cursorPositionChanged.connect(changenote)
-                         a += 1
-
-                     for i in secondscreen:
-                         i.setVisible(True)
-
-                 else:
-                     ipw.setVisible(True)
-             elif self.loginptxt == 'admin':
-                 if self.passinptxt == "root":
-                     adminmode()
-                 else:
-                    ipw.setVisible(True)
-             elif self.loginptxt not in dba:
-                 tlde.setVisible(True)
-
-
-         cash = Path(appdatalocation + '/Mi.Notes/cash')
-         seccash = Path(appdatalocation + '/Mi.Notes/secash')
-         if not seccash.is_file():
-             savetime = open(appdatalocation + '/Mi.Notes/secash', "wb")
-             pickle.dump({0:13}, savetime)
-             savetime.close()
-         else:
-            readtime = open(appdatalocation + '/Mi.Notes/secash', 'rb')
-            oldtime = pickle.load(readtime)
-            readtime.close()
-            for i in oldtime:
-                if not oldtime[i] >12:
-                    oldminutes = i
-                    if oldtime[oldminutes] == int(datetime.now().strftime("%m")) and oldminutes < int(datetime.now().strftime("%d")) * 1440 + int(datetime.now().strftime("%H")) *60 + int(datetime.now().strftime("%M")):
-                        savetime = open(appdatalocation + '/Mi.Notes/secash', "wb")
-                        pickle.dump({0:13}, savetime)
-                        savetime.close()
-                        setcashdeleting()
-             
-
-
-
-         if not cash.is_file():
-             savelogin = open(appdatalocation + '/Mi.Notes/cash', "wb")
-             pickle.dump({0:"Alan"}, savelogin)
-             savelogin.close()
-
-         else:
-             readlogin = open(appdatalocation + '/Mi.Notes/cash', 'rb')
-             self.cashforlogin = pickle.load(readlogin)
-             for i in self.cashforlogin:
-                 if i == 1:
-                     self.checkforcash = True
-                     self.loginptxt = self.cashforlogin[1]
-                     self.passinptxt = (passwordcipher.decrypt(dba[self.loginptxt])).decode('utf-8') 
-                     login()
-
-             readlogin.close()
-
-
 
 
          def newnote():
